@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>মাসের বাজার — মাসিক নিত্যপণ্যের হিসাব</title>
+<style>
+  :root{
+    --bg:#f7f2e7; --card:#fffdf6; --brick:#9e3a2e; --brick-dark:#7e2c22;
+    --ink:#2e2620; --muted:#7a6a5c; --line:#e5d9c6; --soft:#f1e8d5;
+    --green:#3f7a3a;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0; padding:0;}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:"Hind Siliguri","Noto Sans Bengali","SolaimanLipi",system-ui,sans-serif;
+    font-size:15px; line-height:1.45;
+  }
+  .wrap{max-width:1060px; margin:0 auto; padding:14px 12px 40px;}
+
+  /* ---------- header ---------- */
+  header{display:flex; align-items:center; gap:10px; padding:6px 2px 12px;}
+  .logo{
+    width:42px; height:42px; flex:0 0 42px; border-radius:11px;
+    background:var(--brick); display:flex; align-items:center; justify-content:center;
+  }
+  .logo svg{width:26px; height:26px;}
+  header h1{font-size:21px; margin:0; line-height:1.15; color:var(--brick-dark);}
+  header p{margin:1px 0 0; font-size:12.5px; color:var(--muted); line-height:1.3;}
+
+  /* ---------- cards ---------- */
+  .card{
+    background:var(--card); border:1px solid var(--line); border-radius:14px;
+    padding:12px 14px; margin-bottom:12px;
+    box-shadow:0 1px 2px rgba(94,64,32,.05);
+  }
+  .card h2{
+    font-size:13px; margin:0 0 10px; color:var(--brick); letter-spacing:.02em;
+    display:flex; align-items:center; gap:6px; line-height:1.2;
+  }
+  .card h2 svg{width:15px; height:15px; flex:0 0 15px;}
+
+  /* ---------- inputs ---------- */
+  .grid{display:grid; grid-template-columns:1fr; gap:12px;}
+  @media (min-width:760px){
+    .grid{grid-template-columns:340px 1fr; align-items:start;}
+    .grid .card{margin-bottom:0;}
+    .right-col .card{margin-bottom:12px;}
+  }
+  .rowline{display:flex; align-items:center; justify-content:space-between; gap:10px; padding:5px 0;}
+  .rowline + .rowline{border-top:1px dashed var(--line);}
+  .rowline .lab{font-size:14.5px; display:flex; align-items:center; gap:8px; line-height:1.25;}
+  .rowline .lab svg{width:18px; height:18px; flex:0 0 18px;}
+  .rowline .sub{font-size:11.5px; color:var(--muted); display:block; line-height:1.25;}
+
+  .stepper{display:flex; align-items:center; gap:0; border:1px solid var(--line); border-radius:999px; overflow:hidden; background:#fff;}
+  .stepper button{
+    width:32px; height:32px; border:0; background:var(--soft); color:var(--brick-dark);
+    font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center;
+    line-height:1; font-family:inherit; padding:0;
+  }
+  .stepper button:active{background:#e7d9bd;}
+  .stepper .val{
+    min-width:40px; text-align:center; font-weight:700; font-size:15px; line-height:1;
+    display:flex; align-items:center; justify-content:center; height:32px;
+  }
+
+  .seg{display:flex; background:var(--soft); border-radius:10px; padding:3px; gap:3px; margin-top:4px;}
+  .seg button{
+    flex:1; border:0; background:transparent; color:var(--muted); cursor:pointer;
+    font-family:inherit; font-size:13.5px; font-weight:600; border-radius:8px;
+    padding:7px 2px; line-height:1; display:flex; align-items:center; justify-content:center; min-height:30px;
+  }
+  .seg button.on{background:var(--brick); color:#fdf6ec;}
+  .seglabel{font-size:13px; color:var(--muted); margin:10px 0 2px; line-height:1.3;}
+  .seglabel:first-of-type{margin-top:2px;}
+
+  /* ---------- list ---------- */
+  .list-head{display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:6px;}
+  .list-head h2{margin:0;}
+  .progress{font-size:12px; color:var(--muted); white-space:nowrap; line-height:1.2;}
+  .progress b{color:var(--green);}
+  .pbar{height:6px; background:var(--soft); border-radius:99px; overflow:hidden; margin:6px 0 8px;}
+  .pbar i{display:block; height:100%; background:var(--green); width:0%; transition:width .25s;}
+
+  .item{
+    display:flex; align-items:center; gap:10px; padding:8px 2px;
+    border-top:1px solid var(--line);
+  }
+  .item:first-of-type{border-top:0;}
+  .tick{
+    width:26px; height:26px; flex:0 0 26px; border-radius:50%;
+    border:2px solid #cdbfa4; background:#fff;
+    cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0;
+  }
+  .tick svg{width:14px; height:14px; opacity:0;}
+  .item.done .tick{background:var(--green); border-color:var(--green);}
+  .item.done .tick svg{opacity:1;}
+  .item .ic{
+    width:34px; height:34px; flex:0 0 34px; border-radius:9px; background:var(--soft);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .item .ic svg{width:20px; height:20px;}
+  .item .nm{flex:1; min-width:0;}
+  .item .nm .n{font-size:14.5px; font-weight:600; line-height:1.25;}
+  .item .nm .d{font-size:11.5px; color:var(--muted); line-height:1.25;}
+  .item.done .nm .n{color:var(--muted); text-decoration:line-through;}
+  .qty{display:flex; align-items:center; gap:6px;}
+  .qty .q{
+    font-weight:700; font-size:14.5px; white-space:nowrap; line-height:1;
+    display:flex; align-items:center; height:30px;
+  }
+  .qty .q small{font-size:11.5px; color:var(--muted); font-weight:600; margin-left:3px;}
+  .mini{display:flex; flex-direction:column; gap:3px;}
+  .mini button{
+    width:24px; height:15px; border:1px solid var(--line); background:#fff; border-radius:5px;
+    color:var(--brick-dark); cursor:pointer; font-size:11px; padding:0;
+    display:flex; align-items:center; justify-content:center; line-height:1; font-family:inherit;
+  }
+  .mini button:active{background:var(--soft);}
+
+  .actions{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;}
+  .btn{
+    border:1px solid var(--brick); background:#fff; color:var(--brick-dark); cursor:pointer;
+    font-family:inherit; font-size:13px; font-weight:600; border-radius:999px;
+    padding:0 14px; height:32px; line-height:1; display:inline-flex; align-items:center; justify-content:center; gap:6px;
+  }
+  .btn svg{width:14px; height:14px;}
+  .btn.primary{background:var(--brick); color:#fdf6ec;}
+  .btn:active{opacity:.85;}
+
+  .note{font-size:12px; color:var(--muted); line-height:1.5; margin:2px 0 0;}
+  footer{font-size:11.5px; color:var(--muted); text-align:center; padding:8px 4px 0; line-height:1.5;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="logo" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fdf6ec" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 8h16l-1.5 11a2 2 0 0 1-2 1.7h-9A2 2 0 0 1 5.5 19L4 8Z"/>
+        <path d="M8.5 10V6.5a3.5 3.5 0 0 1 7 0V10"/>
+      </svg>
+    </div>
+    <div>
+      <h1>মাসের বাজার</h1>
+      <p>পরিবারের সদস্য আর খাওয়ার অভ্যাস দিলেই মাসের নিত্যপণ্যের হিসাব</p>
+    </div>
+  </header>
+
+  <div class="grid">
+    <!-- ===== inputs ===== -->
+    <div class="card">
+      <h2>
+        <svg viewBox="0 0 24 24" fill="none" stroke="#9e3a2e" stroke-width="1.8" stroke-linecap="round"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.6-3 2.8-4.5 5.5-4.5S13.9 16 14.5 19"/><circle cx="17" cy="9" r="2.4"/><path d="M15.5 14.6c2.3.2 4.3 1.6 4.9 4.4"/></svg>
+        পরিবারের হিসাব
+      </h2>
+
+      <div class="rowline">
+        <div class="lab">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#9e3a2e" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="7.5" r="3.4"/><path d="M5 20c.8-3.8 3.6-5.6 7-5.6s6.2 1.8 7 5.6"/></svg>
+          <span>বড়রা<span class="sub">১২ বছর ও তার বেশি</span></span>
+        </div>
+        <div class="stepper">
+          <button type="button" data-step="adults|-1" aria-label="কমাও">−</button>
+          <div class="val" id="v-adults">৪</div>
+          <button type="button" data-step="adults|1" aria-label="বাড়াও">+</button>
+        </div>
+      </div>
+
+      <div class="rowline">
+        <div class="lab">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#9e3a2e" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="9" r="2.7"/><path d="M6.5 20c.6-3 2.8-4.4 5.5-4.4s4.9 1.4 5.5 4.4"/></svg>
+          <span>বাচ্চারা<span class="sub">১২ বছরের কম</span></span>
+        </div>
+        <div class="stepper">
+          <button type="button" data-step="children|-1" aria-label="কমাও">−</button>
+          <div class="val" id="v-children">০</div>
+          <button type="button" data-step="children|1" aria-label="বাড়াও">+</button>
+        </div>
+      </div>
+
+      <div class="seglabel">খাওয়ার অভ্যাস</div>
+      <div class="seg" id="seg-habit">
+        <button type="button" data-habit="rice" class="on">ভাত বেশি</button>
+        <button type="button" data-habit="mix">মাঝামাঝি</button>
+        <button type="button" data-habit="roti">রুটি বেশি</button>
+      </div>
+
+      <div class="seglabel">বাসায় খাওয়া হয়</div>
+      <div class="seg" id="seg-meals">
+        <button type="button" data-meals="1" class="on">৩ বেলাই</button>
+        <button type="button" data-meals="0.8">২ বেলা</button>
+        <button type="button" data-meals="0.55">১ বেলা</button>
+      </div>
+
+      <p class="note">পরিমাণ নিজে বদলালে সেটাই মনে থাকবে। হিসাব বদলালে শুধু না-বদলানো আইটেমগুলো আবার হিসাব হবে।</p>
+    </div>
+
+    <!-- ===== list ===== -->
+    <div class="right-col">
+      <div class="card">
+        <div class="list-head">
+          <h2>
+            <svg viewBox="0 0 24 24" fill="none" stroke="#9e3a2e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5h12l-1 17h-10l-1-17Z"/><path d="M9 8.5h6M9.8 12.5h4.4"/></svg>
+            মাসের তালিকা
+          </h2>
+          <div class="progress" id="progress">কেনা হয়েছে <b>০</b> / ০টি</div>
+        </div>
+        <div class="pbar"><i id="pbar-fill"></i></div>
+        <div id="list"></div>
+        <div class="actions">
+          <button type="button" class="btn primary" id="btn-copy">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="8.5" y="8.5" width="11" height="12" rx="2"/><path d="M15.5 8.5v-3a2 2 0 0 0-2-2h-7a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h2"/></svg>
+            তালিকা কপি করো
+          </button>
+          <button type="button" class="btn" id="btn-untick">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10a8 8 0 0 1 14.5-3M20 14a8 8 0 0 1-14.5 3"/><path d="M18.5 3.5v3.5H15M5.5 20.5V17H9"/></svg>
+            টিক মোছো
+          </button>
+          <button type="button" class="btn" id="btn-reset">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5.5h14M10 5V4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v1M7 5.5l.8 13a2 2 0 0 0 2 1.9h4.4a2 2 0 0 0 2-1.9l.8-13"/></svg>
+            সব আবার হিসাব
+          </button>
+        </div>
+      </div>
+      <p class="note" style="padding:0 4px;">হিসাবটা গড়পড়তা ধারণা থেকে — বাসায় মেহমান বেশি এলে বা কারো খাওয়া বেশি-কম হলে +/− দিয়ে মিলিয়ে নাও। বাজারে গিয়ে কেনা হয়ে গেলে বাম পাশের গোলটায় টিক দাও।</p>
+    </div>
+  </div>
+
+  <footer>মাসের বাজার · Nasheed Library — হিসাব এই ফোনেই থাকে, কোথাও পাঠানো হয় না</footer>
+</div>
+
+<script>
+/*
+  Per-capita monthly assumptions (per ADULT per month, all meals at home = factor 1):
+    চাল   rice-heavy 14 kg · balanced 11.5 kg · roti-heavy 8 kg   (≈ 380–470 g cooked-weight rice/day raw ~460 g — BD rice-heavy norm 12–15 kg)
+    আটা   rice-heavy 2 kg · balanced 4 kg · roti-heavy 7 kg
+    ডাল   1.5 kg · তেল 1.5 L · পেঁয়াজ 2 kg · আলু 3 kg
+    হলুদ গুঁড়া 100 g · মরিচ গুঁড়া 100 g · জিরা 50 g
+    চিনি 1 kg · লবণ 0.25 kg · চা পাতা 100 g (adults only)
+    ডিম 20 pcs (adult) / 15 pcs (child) · গুঁড়া দুধ 0.25 kg (adult) / 0.5 kg (child)
+  Child factor for staples ≈ 0.6 (tea 0, eggs/milk use own values).
+  Meals-at-home factor: 3 meals = 1 · 2 meals = 0.8 · 1 meal = 0.55.
+  Rounding to shop-friendly amounts: kg/L to 0.5 (small ones 0.25), grams to 25, eggs to 4 (১ হালি).
+*/
+var ITEMS = [
+  {id:'chal',   name:'চাল',        unit:'কেজি',  step:1,   round:0.5,  cf:0.6, per:{rice:14,  mix:11.5, roti:8},  icon:'rice'},
+  {id:'ata',    name:'আটা',        unit:'কেজি',  step:1,   round:0.5,  cf:0.5, per:{rice:2,   mix:4,    roti:7},  icon:'flour'},
+  {id:'dal',    name:'ডাল',        unit:'কেজি',  step:0.5, round:0.25, cf:0.6, per:{rice:1.5, mix:1.5,  roti:1.5}, icon:'dal'},
+  {id:'tel',    name:'তেল',        unit:'লিটার', step:0.5, round:0.5,  cf:0.5, per:{rice:1.5, mix:1.5,  roti:1.5}, icon:'oil'},
+  {id:'peyaj',  name:'পেঁয়াজ',     unit:'কেজি',  step:0.5, round:0.5,  cf:0.5, per:{rice:2,   mix:2,    roti:2},   icon:'onion'},
+  {id:'alu',    name:'আলু',        unit:'কেজি',  step:1,   round:0.5,  cf:0.6, per:{rice:3,   mix:3,    roti:3},   icon:'potato'},
+  {id:'holud',  name:'হলুদ গুঁড়া', unit:'গ্রাম', step:25,  round:25,   cf:0.3, per:{rice:100, mix:100,  roti:100}, icon:'spice'},
+  {id:'morich', name:'মরিচ গুঁড়া', unit:'গ্রাম', step:25,  round:25,   cf:0.3, per:{rice:100, mix:100,  roti:100}, icon:'spice2'},
+  {id:'jira',   name:'জিরা',       unit:'গ্রাম', step:25,  round:25,   cf:0.3, per:{rice:50,  mix:50,   roti:50},  icon:'spice'},
+  {id:'chini',  name:'চিনি',       unit:'কেজি',  step:0.5, round:0.25, cf:0.5, per:{rice:1,   mix:1,    roti:1},   icon:'sugar'},
+  {id:'lobon',  name:'লবণ',        unit:'কেজি',  step:0.25,round:0.25, cf:0.5, per:{rice:0.25,mix:0.25, roti:0.25},icon:'salt'},
+  {id:'cha',    name:'চা পাতা',    unit:'গ্রাম', step:25,  round:25,   cf:0,   per:{rice:100, mix:100,  roti:100}, icon:'tea'},
+  {id:'dim',    name:'ডিম',        unit:'টি',    step:4,   round:4,    cf:null, adult:20, child:15,                 icon:'egg'},
+  {id:'dudh',   name:'গুঁড়া দুধ', unit:'কেজি',  step:0.25,round:0.25, cf:null, adult:0.25, child:0.5,              icon:'milk'}
+];
+
+var ICONS = {
+  rice:'<svg viewBox="0 0 24 24" fill="none" stroke="#9e3a2e" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 10.5 7.4 19.7a1.9 1.9 0 0 0 1.9 1.7h5.4a1.9 1.9 0 0 0 1.9-1.7l.9-9.2"/><path d="M5.8 10.5h12.4"/><path d="M9.7 10.5c.3-2 .9-3.4 2.3-4.7 1.4 1.3 2 2.7 2.3 4.7M9.8 15.5h4.4"/></svg>',
+  flour:'<svg viewBox="0 0 24 24" fill="none" stroke="#9e3a2e" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10.5 8 19.7a1.9 1.9 0 0 0 1.9 1.7h4.2A1.9 1.9 0 0 0 16 19.7l1-9.2"/><path d="M6.3 10.5h11.4"/><path d="M10 10.5c.2-1.7.8-3 2-4.2 1.2 1.2 1.8 2.5 2 4.2"/></svg>',
+  dal:'<svg viewBox="0 0 24 24" fill="none" stroke="#9e3a2e" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11h16a8 8 0 0 1-16 0Z"/><path d="M7 8.2c1.5-1 3.2-1.5 5-1.5s3.5.5 5 1.5"/></svg>',
+  oil:'<svg viewBox="0 0 24 24" fill="none" stroke="#9e3a2e" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3.5h4M10.5 3.5v3L8 10v9.5A1.8 1.8 0 0 0 9.8 21.3h4.4A1.8 1.8 0 0 0 16 19.5V10l-2.5-3.5v-3"/><path d="M8 14.5h8"/></svg>',
+  onion:'<svg viewBox="0 0 24 24" fill="none" stroke="#9e3a2e" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.5c3.9 2 6 4.9 6 8.3a6 5.7 0 1 1-12 0c0-3.4 2.1-6.3 6-8.3Z"/><path d="M12 6.5c0-1.6.5-2.7 1.6-3.7M12 9v10"/></svg>',
+  potato:'<svg viewBox="0 0 24 24" fill="none" stroke="#9e3a2e" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7.2 8.6c2.8-2.4 7.4-2 10 .8s2.6 7.2-.2 9.6-7.2 2-9.8-.6-2.4-7.4.2-9.8Z"/><circle cx="10" cy="11" r=".4" fill="#9e3a2e"/><circle cx="14.5" cy="14.5" r=".4" fill="#9e3a2e"/><circle cx="11" cy="16.8" r=".4" fill="#9e3a2e"/></svg>',
+  spice:'<svg viewBox="0 0 24 24" fill="none" stroke="#9e3a2e" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 10h14l-1.2 9.3a2 2 0 0 1-2 1.7H8.2a2 2 0 0 1-2-1.7L5 10Z"/><path d="M8 10c0-2.5 1.8-4 4-4s4 1.5 4 4"/></svg>',
+  spice2:'<svg viewBox="0 0 24 24" fill="none" stroke="#9e3a2e" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 10h14l-1.2 9.3a2 2 0 0 1-2 1.7H8.2a2 2 0 0 1-2-1.7L5 10Z"/><path d="M8.5 6.8C10 5.4 11 5 12 5s2 .4 3.5 1.8"/></svg>',
+  sugar:'<svg viewBox="0 0 24 24" fill="none" stroke="#9e3a2e" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 8.5 8 20a1.8 1.8 0 0 0 1.8 1.6h4.4A1.8 1.8 0 0 0 16 20l1-11.5"/><path d="M6.4 8.5h11.2M9.5 14h5"/></svg>',
+  salt:'<svg viewBox="0 0 24 24" fill="none" stroke="#9e3a2e" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6v3.2L17 11v8.3a1.8 1.8 0 0 1-1.8 1.7H8.8A1.8 1.8 0 0 1 7 19.3V11l2-3.8V4Z"/><path d="M9.5 14.5h5"/></svg>',
+  tea:'<svg viewBox="0 0 24 24" fill="none" stroke="#9e3a2e" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 10h11v5.5A4.5 4.5 0 0 1 11.5 20h-2A4.5 4.5 0 0 1 5 15.5V10Z"/><path d="M16 11h1.2a2.8 2.8 0 0 1 0 5.6H16M8 4.5c0 1.2 1 1.4 1 2.5M12 4.5c0 1.2 1 1.4 1 2.5"/></svg>',
+  egg:'<svg viewBox="0 0 24 24" fill="none" stroke="#9e3a2e" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.8c2.9 2.2 4.8 6 4.8 9.4a4.8 4.8 0 1 1-9.6 0c0-3.4 1.9-7.2 4.8-9.4Z"/></svg>',
+  milk:'<svg viewBox="0 0 24 24" fill="none" stroke="#9e3a2e" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 3.5h5v3l1.8 2.7v10a1.8 1.8 0 0 1-1.8 1.8h-5A1.8 1.8 0 0 1 7.7 19.2v-10L9.5 6.5v-3Z"/><path d="M7.7 13h8.6"/></svg>'
+};
+var CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5 9.8 17.8 19.5 6.5"/></svg>';
+
+var KEY = 'maser-bazar-v1';
+var state = { adults:4, children:0, habit:'rice', meals:1, qty:{}, custom:{}, ticks:{} };
+
+function load(){
+  try{
+    var s = JSON.parse(localStorage.getItem(KEY));
+    if(s && typeof s === 'object'){
+      if(typeof s.adults === 'number') state.adults = s.adults;
+      if(typeof s.children === 'number') state.children = s.children;
+      if(s.habit) state.habit = s.habit;
+      if(typeof s.meals === 'number') state.meals = s.meals;
+      if(s.qty) state.qty = s.qty;
+      if(s.custom) state.custom = s.custom;
+      if(s.ticks) state.ticks = s.ticks;
+    }
+  }catch(e){}
+}
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
+
+var BN = {'0':'০','1':'১','2':'২','3':'৩','4':'৪','5':'৫','6':'৬','7':'৭','8':'৮','9':'৯','.':'.'};
+function bn(n){
+  var s = String(n).replace(/\.0+$/,'').replace(/(\.\d*?)0+$/,'$1');
+  return s.replace(/[0-9.]/g, function(c){ return BN[c]; });
+}
+function roundTo(v, r){ return Math.round(v / r) * r; }
+
+function compute(it){
+  var mf = state.meals;
+  var raw;
+  if(it.cf === null){
+    raw = (state.adults * it.adult + state.children * it.child) * mf;
+  }else{
+    raw = (state.adults + state.children * it.cf) * it.per[state.habit] * mf;
+  }
+  var q = roundTo(raw, it.round);
+  if(q <= 0 && raw > 0) q = it.round;
+  return Math.round(q * 100) / 100;
+}
+function qtyOf(it){
+  if(state.custom[it.id] && typeof state.qty[it.id] === 'number') return state.qty[it.id];
+  return compute(it);
+}
+
+function render(){
+  document.getElementById('v-adults').textContent = bn(state.adults);
+  document.getElementById('v-children').textContent = bn(state.children);
+  var hb = document.querySelectorAll('#seg-habit button');
+  for(var i=0;i<hb.length;i++) hb[i].classList.toggle('on', hb[i].getAttribute('data-habit') === state.habit);
+  var mb = document.querySelectorAll('#seg-meals button');
+  for(var j=0;j<mb.length;j++) mb[j].classList.toggle('on', parseFloat(mb[j].getAttribute('data-meals')) === state.meals);
+
+  var list = document.getElementById('list');
+  list.innerHTML = '';
+  var doneCount = 0;
+  ITEMS.forEach(function(it){
+    var q = qtyOf(it);
+    var done = !!state.ticks[it.id];
+    if(done) doneCount++;
+    var row = document.createElement('div');
+    row.className = 'item' + (done ? ' done' : '');
+    var detail = it.id === 'dim' ? 'প্রায় ' + bn(Math.round(q/4)) + ' হালি' : '';
+    row.innerHTML =
+      '<button type="button" class="tick" data-tick="' + it.id + '" aria-label="কেনা হয়েছে">' + CHECK + '</button>' +
+      '<div class="ic">' + ICONS[it.icon] + '</div>' +
+      '<div class="nm"><div class="n">' + it.name + '</div>' + (detail ? '<div class="d">' + detail + '</div>' : '') + '</div>' +
+      '<div class="qty"><div class="q">' + bn(q) + '<small>' + it.unit + '</small></div>' +
+      '<div class="mini"><button type="button" data-adj="' + it.id + '|1" aria-label="বাড়াও">+</button>' +
+      '<button type="button" data-adj="' + it.id + '|-1" aria-label="কমাও">−</button></div></div>';
+    list.appendChild(row);
+  });
+  document.getElementById('progress').innerHTML = 'কেনা হয়েছে <b>' + bn(doneCount) + '</b> / ' + bn(ITEMS.length) + 'টি';
+  document.getElementById('pbar-fill').style.width = (ITEMS.length ? (doneCount / ITEMS.length * 100) : 0) + '%';
+}
+
+document.addEventListener('click', function(e){
+  var t = e.target;
+  while(t && t !== document.body){
+    if(t.getAttribute){
+      var st = t.getAttribute('data-step');
+      if(st){
+        var p = st.split('|'), k = p[0], d = parseInt(p[1], 10);
+        state[k] = Math.max(0, Math.min(30, state[k] + d));
+        save(); render(); return;
+      }
+      var hb2 = t.getAttribute('data-habit');
+      if(hb2){ state.habit = hb2; save(); render(); return; }
+      var ml = t.getAttribute('data-meals');
+      if(ml){ state.meals = parseFloat(ml); save(); render(); return; }
+      var tk = t.getAttribute('data-tick');
+      if(tk){ state.ticks[tk] = !state.ticks[tk]; save(); render(); return; }
+      var aj = t.getAttribute('data-adj');
+      if(aj){
+        var q2 = aj.split('|'), id = q2[0], dir = parseInt(q2[1], 10);
+        var it = null;
+        for(var i=0;i<ITEMS.length;i++) if(ITEMS[i].id === id) it = ITEMS[i];
+        if(it){
+          var nv = Math.round((qtyOf(it) + dir * it.step) * 100) / 100;
+          if(nv < 0) nv = 0;
+          state.qty[id] = nv; state.custom[id] = true;
+          save(); render();
+        }
+        return;
+      }
+    }
+    t = t.parentNode;
+  }
+});
+
+document.getElementById('btn-untick').addEventListener('click', function(){
+  state.ticks = {}; save(); render();
+});
+document.getElementById('btn-reset').addEventListener('click', function(){
+  state.qty = {}; state.custom = {}; state.ticks = {}; save(); render();
+});
+document.getElementById('btn-copy').addEventListener('click', function(){
+  var lines = ['মাসের বাজার — তালিকা'];
+  ITEMS.forEach(function(it){
+    lines.push((state.ticks[it.id] ? '✓ ' : '• ') + it.name + ' — ' + bn(qtyOf(it)) + ' ' + it.unit);
+  });
+  var txt = lines.join('\n');
+  var btn = this;
+  function ok(){ btn.lastChild.textContent = ' কপি হয়েছে'; setTimeout(function(){ btn.lastChild.textContent = ' তালিকা কপি করো'; }, 1600); }
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(ok, function(){ fallback(); });
+  } else fallback();
+  function fallback(){
+    var ta = document.createElement('textarea');
+    ta.value = txt; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    try{ document.execCommand('copy'); ok(); }catch(e){}
+    document.body.removeChild(ta);
+  }
+});
+
+load();
+render();
+</script>
+</body>
+</html>
